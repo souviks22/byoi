@@ -5,6 +5,8 @@ const tasks: { [key: string]: (args: RuntimeParams) => Promise<any> } = {
 	'get-keys': getKeys,
 	'save-user': saveUser,
 	'get-user': getUser,
+	'save-credential': saveCredential,
+	'get-credential': getCredential,
 	'save-did': saveDocument,
 	'get-did': getDocument,
 	'update-did': updateDocument
