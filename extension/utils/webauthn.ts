@@ -1,10 +1,11 @@
-import type { AttestationParams, AssertionParams } from "@/types/passkey"
+import type { AttestationParams, AssertionParams } from '@/types/passkey'
+import * as uint8arrays from 'uint8arrays'
 
 export const createPasskey = async ({ user, challenge }: AttestationParams) => {
     const credential = await navigator.credentials.create({
         publicKey: {
             user,
-            challenge,
+            challenge: uint8arrays.fromString(JSON.stringify(challenge)),
             pubKeyCredParams: [{
                 type: 'public-key',
                 alg: -7
@@ -18,7 +19,7 @@ export const createPasskey = async ({ user, challenge }: AttestationParams) => {
         }
     }) as PublicKeyCredential
     return {
-        credentialId: new Uint8Array(credential.rawId),
+        credentialId: credential.rawId,
         response: credential.response as AuthenticatorAttestationResponse
     }
 }
@@ -26,8 +27,7 @@ export const createPasskey = async ({ user, challenge }: AttestationParams) => {
 export const getPasskey = async ({ challenge, credentialId }: AssertionParams) => {
     const credential = await navigator.credentials.get({
         publicKey: {
-            challenge,
-
+            challenge: uint8arrays.fromString(JSON.stringify(challenge)),
             allowCredentials: [{
                 id: credentialId,
                 type: 'public-key'
