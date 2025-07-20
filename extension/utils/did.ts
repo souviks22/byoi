@@ -1,9 +1,19 @@
-import type { Did, DidDocument, DidKeys } from '@/types/did'
+import type { Did, DidDocument, DidKeys, DidUser } from '@/types/did'
 import type { RuntimeMessage, RuntimeResponse } from '@/types/messaging'
 import type IonCreateRequestModel from '@decentralized-identity/ion-sdk/dist/lib/models/IonCreateRequestModel'
 import type IonUpdateRequestModel from '@decentralized-identity/ion-sdk/dist/lib/models/IonUpdateRequestModel'
 import type IonAddPublicKeysActionModel from '@decentralized-identity/ion-sdk/dist/lib/models/IonAddPublicKeysActionModel'
 import type IonRemovePublicKeysActionModel from '@decentralized-identity/ion-sdk/dist/lib/models/IonRemovePublicKeysActionModel'
+
+export const saveDidUser = async (user: DidUser) => {
+    const message: RuntimeMessage = {
+        source: 'popup',
+        type: 'save-user',
+        params: { user }
+    }
+    const { success } = await browser.runtime.sendMessage(message) as RuntimeResponse
+    if (!success) throw new Error('Failed to create DID User')
+}
 
 export const saveDidJwk = async (keys: DidKeys) => {
     const message: RuntimeMessage = {
@@ -12,7 +22,7 @@ export const saveDidJwk = async (keys: DidKeys) => {
         params: { keys }
     }
     const { success } = await browser.runtime.sendMessage(message) as RuntimeResponse
-    if (!success) throw new Error('Private Keys Not Saved')
+    if (!success) throw new Error('Failed to save Private Keys')
 }
 
 export const getDidJwk = async (did: Did) => {
@@ -22,18 +32,9 @@ export const getDidJwk = async (did: Did) => {
         params: { did }
     }
     const { success, data } = await browser.runtime.sendMessage(message) as RuntimeResponse
-    if (!success) throw new Error('Private Keys Not Found')
+    if (!success) throw new Error('Failed to fetch Private Keys')
     return data as DidKeys
 }
-
-// const anchor = async (request: IonCreateRequestModel | IonUpdateRequestModel) => {
-//     const res = await fetch('https://ion.tbd.network/operations', {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/json' },
-//         body: JSON.stringify(request),
-//     })
-//     return await res.json()
-// }
 
 export const anchorCreation = async (request: IonCreateRequestModel) => {
     const did: Did = `did:ion:${request.suffixData.deltaHash}`
@@ -48,7 +49,7 @@ export const anchorCreation = async (request: IonCreateRequestModel) => {
         }
     }
     const { success } = await browser.runtime.sendMessage(message) as RuntimeResponse
-    if (!success) throw new Error('DID Creation Failed')
+    if (!success) throw new Error('Failed to create DID')
     return did
 }
 
@@ -68,7 +69,7 @@ export const anchorUpdate = async (request: IonUpdateRequestModel) => {
         }
     }
     const { success } = await browser.runtime.sendMessage(message) as RuntimeResponse
-    if (!success) throw new Error('DID Update Failed')
+    if (!success) throw new Error('Failed to update DID')
 }
 
 export const resolve = async (did: Did) => {
@@ -78,6 +79,15 @@ export const resolve = async (did: Did) => {
         params: { did }
     }
     const { success, data } = await browser.runtime.sendMessage(message) as RuntimeResponse
-    if (!success) throw new Error('DID Resolution Failed')
+    if (!success) throw new Error('Failed to resolve DID')
     return data as DidDocument
 }
+
+// const anchor = async (request: IonCreateRequestModel | IonUpdateRequestModel) => {
+//     const res = await fetch('https://ion.tbd.network/operations', {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify(request),
+//     })
+//     return await res.json()
+// }
