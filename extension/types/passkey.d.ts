@@ -1,5 +1,7 @@
+import { Base64Url } from './did'
+
 export interface AuthChallenge {
-    payload: Uint8Array
+    payload: Base64Url
     timestamp: number
 }
 

@@ -1,15 +1,10 @@
-import type { Did, DidPasskey, DidDocument, DidKeys, DidPatch, DidUser } from './did'
-import type { Base64Url } from './did'
-
-export interface WindowChallenge {
-    payload: Base64Url
-    timestamp: number
-}
+import type { Did, DidPasskey, DidDocument, DidKeys, DidPatch, DidUser, Base64Url } from './did'
+import type { AuthChallenge } from './passkey'
 
 export interface WindowMessage {
     source: 'byoi-sdk' | 'byoi-extension'
     type: 'signin-request' | 'signin-response'
-    challenge: WindowChallenge,
+    challenge: AuthChallenge,
     auth?: {
         trigger: 'signup' | 'signin'
         publicKey: JsonWebKey
