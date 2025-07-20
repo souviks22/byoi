@@ -5,52 +5,61 @@ import { IonPublicKeyPurpose } from '@decentralized-identity/ion-sdk'
 import * as uint8arrays from 'uint8arrays'
 
 export const signin = async ({ id, name, displayName }: DidUser, challenge: AuthChallenge) => {
-    const credential = await getCredentialFromIDB(id)
-    if (!credential) {
-        const { response, credentialId } = await createPasskey({
-            challenge,
-            user: {
-                name, displayName,
-                id: uint8arrays.fromString(id)
-            }
-        })
-        const { patch, publicJwk } = await getPublicKeyAdditionData(response.getPublicKey()!)
-        await updateIonDid({ did: id, patch })
-        await saveCredentialToIDB(id, credentialId)
-        const message: WindowMessage = {
-            source: 'byoi-extension',
-            type: 'signin-response',
-            challenge,
-            auth: {
-                trigger: 'signup',
-                publicKey: publicJwk,
-                signup: {
-                    clientDataJSON: bytesToB64url(response.clientDataJSON),
-                    attestationObject: bytesToB64url(response.attestationObject)
+    try {
+        const credential = await getCredentialFromIDB(id)
+        if (!credential) {
+            const { response, credentialId } = await createPasskey({
+                challenge,
+                user: {
+                    name, displayName,
+                    id: uint8arrays.fromString(id)
+                }
+            })
+            const { patch, publicJwk } = await getPublicKeyAdditionData(response.getPublicKey()!)
+            await updateIonDid({ did: id, patch })
+            await saveCredentialToIDB(id, credentialId)
+            const message: WindowMessage = {
+                source: 'byoi-extension',
+                type: 'signin-response',
+                challenge,
+                auth: {
+                    trigger: 'signup',
+                    publicKey: publicJwk,
+                    signup: {
+                        clientDataJSON: bytesToB64url(response.clientDataJSON),
+                        attestationObject: bytesToB64url(response.attestationObject)
+                    }
                 }
             }
+            window.postMessage(message, window.location.origin)
+        } else {
+            const { response } = await getPasskey({
+                challenge,
+                credentialId: b64urlToBytes(credential)
+            })
+            const { content: document } = await resolveIonDid(id)
+            const { publicKeyJwk } = document.publicKeys?.filter(pk => pk.id === utfToB64url(window.location.hostname))[0]!
+            const message: WindowMessage = {
+                source: 'byoi-extension',
+                type: 'signin-response',
+                challenge,
+                auth: {
+                    trigger: 'signin',
+                    publicKey: publicKeyJwk,
+                    signin: {
+                        clientDataJSON: bytesToB64url(response.clientDataJSON),
+                        authenticatorData: bytesToB64url(response.authenticatorData),
+                        signature: bytesToB64url(response.signature)
+                    }
+                }
+            }
+            window.postMessage(message, window.location.origin)
         }
-        window.postMessage(message, window.location.origin)
-    } else {
-        const { response } = await getPasskey({
-            challenge,
-            credentialId: b64urlToBytes(credential)
-        })
-        const { content: document } = await resolveIonDid(id)
-        const { publicKeyJwk } = document.publicKeys?.filter(pk => pk.id === utfToB64url(window.location.hostname))[0]!
+    } catch {
         const message: WindowMessage = {
             source: 'byoi-extension',
-            type: 'signin-response',
-            challenge,
-            auth: {
-                trigger: 'signin',
-                publicKey: publicKeyJwk,
-                signin: {
-                    clientDataJSON: bytesToB64url(response.clientDataJSON),
-                    authenticatorData: bytesToB64url(response.authenticatorData),
-                    signature: bytesToB64url(response.signature)
-                }
-            }
+            type: 'signin-error',
+            challenge
         }
         window.postMessage(message, window.location.origin)
     }

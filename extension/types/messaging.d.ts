@@ -3,7 +3,7 @@ import type { AuthChallenge } from './passkey'
 
 export interface WindowMessage {
     source: 'byoi-sdk' | 'byoi-extension'
-    type: 'signin-request' | 'signin-response'
+    type: 'signin-request' | 'signin-response' | 'signin-error'
     challenge: AuthChallenge,
     auth?: {
         trigger: 'signup' | 'signin'
