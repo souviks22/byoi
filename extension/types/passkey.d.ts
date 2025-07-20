@@ -1,13 +1,14 @@
+export interface AuthChallenge {
+    payload: Uint8Array
+    timestamp: number
+}
+
 export interface AttestationParams {
-    challenge: Uint8Array
-    user: {
-        id: Uint8Array
-        name: string
-        displayName: string
-    }
+    challenge: AuthChallenge
+    user: PublicKeyCredentialUserEntity
 }
 
 export interface AssertionParams {
-    challenge: Uint8Array
+    challenge: AuthChallenge
     credentialId: Uint8Array
 }

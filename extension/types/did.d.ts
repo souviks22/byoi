@@ -1,11 +1,7 @@
 import type { JwkEs256k, IonPublicKeyModel, IonDocumentModel } from '@decentralized-identity/ion-sdk'
 
-export type Did = `did:ion:${string}`
-
-export interface DidPatch {
-    publicKeysToAdd?: IonPublicKeyModel[]
-    idsOfPublicKeysToRemove?: string[]
-}
+export type Did = `did:ion:${string}` | '<all_users>'
+export type Base64Url = string & { __brand: 'base64url' }
 
 export interface DidKeys {
     id: Did
@@ -17,12 +13,28 @@ export interface DidKeys {
 
 export interface DidUser {
     id: Did
-    name: string,
-    displayName: string,
+    name: string
+    displayName: string
     email?: string
 }
 
+export interface DidPasskey {
+    id: Did
+    domain: Base64Url
+    credentialId?: Base64Url
+}
+
+export interface DidCredentials {
+    id: Did
+    content: { [domain: Base64Url]: Base64Url }
+}
+
 export interface DidDocument {
-    id: Did,
+    id: Did
     content: IonDocumentModel
+}
+
+export interface DidPatch {
+    publicKeysToAdd?: IonPublicKeyModel[]
+    idsOfPublicKeysToRemove?: string[]
 }
