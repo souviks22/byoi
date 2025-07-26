@@ -7,7 +7,7 @@ export interface User {
     profile?: string
 }
 
-export interface UserError {
+export interface UserPropertiesError {
     name: boolean
     displayName: boolean
     email: boolean
