@@ -1,10 +1,11 @@
 import { IonKey, IonRequest, LocalSigner } from '@decentralized-identity/ion-sdk'
 import type { Did, DidPatch } from '@/types/did'
 
-export const createIonDid = async ({ name, displayName, email }: {
+export const createIonDid = async ({ name, displayName, email, profile }: {
     name: string
     displayName: string
     email?: string
+    profile?: string
 }) => {
     const [recoveryPublicJwk, recoveryPrivateJwk] = await IonKey.generateEs256kOperationKeyPair()
     const [updatePublicJwk, updatePrivateJwk] = await IonKey.generateEs256kOperationKeyPair()
@@ -23,8 +24,7 @@ export const createIonDid = async ({ name, displayName, email }: {
         updatePublicJwk,
         updatePrivateJwk
     })
-    await saveDidUser({ id: did, name, displayName, email })
-    return did
+    return await saveDidUser({ id: did, name, displayName, email, profile })
 }
 
 export const updateIonDid = async ({ did, patch }: {
