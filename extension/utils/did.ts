@@ -13,6 +13,7 @@ export const saveDidUser = async (user: DidUser) => {
     }
     const { success } = await browser.runtime.sendMessage(message) as RuntimeResponse
     if (!success) throw new Error('Failed to create DID User')
+    return user
 }
 
 export const saveDidJwk = async (keys: DidKeys) => {
@@ -23,6 +24,18 @@ export const saveDidJwk = async (keys: DidKeys) => {
     }
     const { success } = await browser.runtime.sendMessage(message) as RuntimeResponse
     if (!success) throw new Error('Failed to save Private Keys')
+    return keys
+}
+
+export const getDidUsers = async () => {
+    const message: RuntimeMessage = {
+        source: 'popup',
+        type: 'get-user',
+        params: { did: '<all_users>' }
+    }
+    const { success, data } = await browser.runtime.sendMessage(message) as RuntimeResponse
+    if (!success) throw new Error('Failed to fetch Did Users')
+    return data as DidUser[]
 }
 
 export const getDidJwk = async (did: Did) => {
