@@ -4,10 +4,12 @@ import { createTheme, ThemeProvider, useMediaQuery } from '@mui/material'
 import Layout from '@/components/popup/Layout'
 import Overview from '@/components/popup/Overview'
 import Creation from '@/components/popup/Creation'
+import Info from '@/components/popup/Infomation'
 
 export default function App() {
   const [state, setState] = useState<PopupState>('did-overview')
   const [users, setUsers] = useState<DidUser[]>([])
+  const [info, setInfo] = useState<DidUser>()
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
 
   const theme = useMemo(() => createTheme({
@@ -36,15 +38,24 @@ export default function App() {
   return <ThemeProvider theme={theme}>
     <Layout>
       {state === 'did-overview' ?
-        <Overview users={users}
+        <Overview
+          users={users}
           onStateChange={setState}
+          onDidInfo={user => {
+            setInfo(user)
+            setState('did-info')
+          }}
         />
         : state === 'did-creation' ?
           <Creation
             onStateChange={setState}
             onUserCreation={(user: DidUser) => setUsers(users => [...users, user])}
           />
-          : null
+          :
+          <Info
+            user={info}
+            onStateChange={setState}
+          />
       }
     </Layout>
   </ThemeProvider>

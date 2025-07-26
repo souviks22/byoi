@@ -3,9 +3,10 @@ import type { DidUser } from '@/types/did'
 import { Info } from 'lucide-react'
 import { Tooltip } from '@mui/material'
 
-export default function Overview({ users, onStateChange }: {
+export default function Overview({ users, onStateChange, onDidInfo }: {
   users: DidUser[]
   onStateChange: (state: PopupState) => void
+  onDidInfo: (user: DidUser) => void
 }) {
   const [currentDid, setCurrentDid] = useState<number>(0)
   useEffect(() => {
@@ -27,7 +28,7 @@ export default function Overview({ users, onStateChange }: {
               {users[currentDid].profile}
             </p>
             <p className='text-xs text-gray-600 dark:text-neutral-400 break-all'>
-              {`${users[currentDid].id.slice(0,20)}...`}
+              {`${users[currentDid].id.slice(0, 20)}...`}
             </p>
           </div>
         </div>
@@ -46,10 +47,13 @@ export default function Overview({ users, onStateChange }: {
                 <div>
                   <p>{did.profile}</p>
                   <p className='text-xs text-gray-600 dark:text-neutral-400 break-all'>
-                    {`${did.id.slice(0,20)}...`}
+                    {`${did.id.slice(0, 20)}...`}
                   </p>
                 </div>
-                <Tooltip title='More info about this DID' arrow onClick={e => e.stopPropagation()}>
+                <Tooltip title='More info about this DID' arrow onClick={e => {
+                  e.stopPropagation()
+                  onDidInfo(did)
+                }}>
                   <Info size={16} className='text-gray-500 dark:text-neutral-400' />
                 </Tooltip>
               </li>
