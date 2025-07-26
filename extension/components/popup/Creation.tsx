@@ -1,26 +1,17 @@
-import type { PopupState, User, UserError } from '@/types/popup'
+import type { PopupState, User, UserPropertiesError } from '@/types/popup'
+import type { DidUser } from '@/types/did'
 import { TextField, CircularProgress, Tooltip } from '@mui/material'
 import { motion } from 'framer-motion'
 import { ArrowLeft } from 'lucide-react'
 
-export default function Creation({ onStateChange }: {
+export default function Creation({ onStateChange, onUserCreation }: {
     onStateChange: (state: PopupState) => void
+    onUserCreation: (user: DidUser) => void
 }) {
     const [creating, setCreating] = useState<boolean>(false)
     const [created, setCreated] = useState<boolean>(false)
     const [user, setUser] = useState<User>()
-    const [error, setError] = useState<UserError>()
-
-    const userIsValid = () => {
-        const error: UserError = {
-            name: !user || !user.name?.trim() || user.name.trim().includes(' '),
-            displayName: !user || !user.displayName?.trim(),
-            email: !!user?.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(user.email.trim()),
-            profile: !!user?.profile && user.profile.trim().length < 3
-        }
-        setError(error)
-        return !Object.values(error).some(e => e)
-    }
+    const [error, setError] = useState<UserPropertiesError>()
 
     const textChangeHandler = (key: string) => {
         return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -31,10 +22,28 @@ export default function Creation({ onStateChange }: {
         }
     }
 
-    const didCreationHandler = () => {
+    const userIsValid = () => {
+        const error: UserPropertiesError = {
+            name: !user || !user.name?.trim() || user.name.trim().includes(' '),
+            displayName: !user || !user.displayName?.trim(),
+            email: !!user?.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(user.email.trim()),
+            profile: !!user?.profile && user.profile.trim().length < 3
+        }
+        setError(error)
+        return !Object.values(error).some(e => e)
+    }
+
+    const didCreationHandler = async () => {
         if (!userIsValid()) return
         setCreating(true)
+        const did = await createIonDid({
+            name: user?.name!,
+            displayName: user?.displayName!,
+            ...user
+        })
+        onUserCreation(did)
         setCreated(true)
+        onStateChange('did-overview')
     }
 
     return !creating ?
