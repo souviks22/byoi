@@ -16,6 +16,7 @@ export interface DidUser {
     name: string
     displayName: string
     email?: string
+    profile?: string
 }
 
 export interface DidPasskey {
