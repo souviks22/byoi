@@ -22,9 +22,6 @@ export default function App() {
       text: {
         primary: prefersDarkMode ? '#ffffff' : '#111111'
       }
-    },
-    typography: {
-      fontFamily: 'Inter, sans-serif'
     }
   }), [prefersDarkMode])
 

@@ -1,27 +1,36 @@
-import type { DidDocument, DidUser } from '@/types/did'
+import type { DidUser } from '@/types/did'
 import type { PopupState } from '@/types/popup'
 import { Card, CardContent, Typography, Box, Avatar, Grid, Divider, Tooltip, List, ListItem, ListItemAvatar, ListItemText } from '@mui/material'
-import { Mail, FileText } from 'lucide-react'
-import { ArrowLeft } from 'lucide-react'
+import { Mail, FileText, ArrowLeft, Copy, Check } from 'lucide-react'
 
 export default function Infomation({ user, onStateChange }: {
     user?: DidUser
     onStateChange: (state: PopupState) => void
 }) {
     const [sites, setSites] = useState<string[]>([])
+    const [copiedDid, setCopiedDid] = useState<boolean>(false)
+
     useEffect(() => {
         (async () => {
             const document = await resolveIonDid(user?.id!)
             setSites(document.content.publicKeys!.map(pk => b64urlToUtf(pk.id)))
         })()
     }, [])
+
+    const copyHandler = async (event: React.MouseEvent) => {
+        event.stopPropagation()
+        await navigator.clipboard.writeText(user?.id!)
+        setCopiedDid(true)
+        setTimeout(() => setCopiedDid(false), 1500)
+    }
+
     return <>
         <div className='flex items-center gap-3'>
             <Tooltip title='Click to go back' arrow onClick={() => onStateChange('did-overview')}>
                 <ArrowLeft size={25} className='p-0.5 rounded-full hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-900 dark:text-neutral-100' />
             </Tooltip>
             <h2 className='text-lg font-semibold text-gray-800 dark:text-neutral-100'>
-                Create New Identity
+                {user?.displayName}
             </h2>
         </div>
         <Card elevation={3} sx={{ borderRadius: 2, bgcolor: 'background.paper', color: 'text.primary', marginBlock: 3 }}>
@@ -61,8 +70,13 @@ export default function Infomation({ user, onStateChange }: {
                             <Typography variant='caption' color='text.secondary'>
                                 DID:
                             </Typography>
-                            <Typography variant='caption' sx={{ maxWidth: 200, overflowWrap: 'break-word' }}>
-                                {user?.id}
+                            <Typography variant='caption' sx={{ maxWidth: 250, overflowWrap: 'break-word' }}>
+                                <code>{user?.id}</code>
+                                <Tooltip title={copiedDid ? 'Copied!' : 'Copy DID'} arrow onClick={copyHandler}>
+                                    <button className='absolute px-2'>
+                                        {copiedDid ? <Check size={16} /> : <Copy size={16} />}
+                                    </button>
+                                </Tooltip>
                             </Typography>
                         </Box>
                     </Grid>
@@ -71,19 +85,19 @@ export default function Infomation({ user, onStateChange }: {
                         <Grid size={12}>
                             <Divider sx={{ my: 2 }} />
                             <Typography variant='subtitle2' gutterBottom>
-                                Websites Signed In With This DID
+                                Websites Signed In with
                             </Typography>
                             <List dense disablePadding>
                                 {sites.map((site, i) => (
                                     <ListItem key={i} disableGutters>
                                         <ListItemAvatar>
-                                            <Avatar src={'https://perishablepress.com/wp/wp-content/images/2021/favicon-standard.png'} alt={site} sx={{ width: 24, height: 24 }} />
+                                            <a href={`https://${site}`} target='_blank'>
+                                                <Avatar src={`https://${site}/favicon.ico`} alt={site} sx={{ width: 30, height: 30 }} />
+                                            </a>
                                         </ListItemAvatar>
                                         <ListItemText
                                             primary={site.split('.').slice(1, 2)}
                                             secondary={site}
-                                            primaryTypographyProps={{ variant: 'body2' }}
-                                            secondaryTypographyProps={{ variant: 'caption' }}
                                         />
                                     </ListItem>
                                 ))}
