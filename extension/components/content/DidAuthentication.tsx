@@ -1,11 +1,10 @@
 import type { RuntimeMessage, RuntimeResponse } from '@/types/messaging'
 import type { DidUser } from '@/types/did'
 import type { AuthChallenge } from '@/types/passkey'
+import { CircularProgress } from '@mui/material'
 import { styles } from './styles'
-import { X } from 'lucide-react'
 import ReactDOM from 'react-dom/client'
 import DidRow from './DidRow'
-import Loader from './Loader'
 
 export default function DidAuthentication({ challenge, onClose }: {
     challenge: AuthChallenge
@@ -13,6 +12,7 @@ export default function DidAuthentication({ challenge, onClose }: {
 }) {
     const [users, setUsers] = useState<DidUser[]>([])
     const [userIsSelected, setUserIsSelected] = useState<boolean>(false)
+
     const getUsers = async () => {
         const message: RuntimeMessage = {
             source: 'content',
@@ -23,6 +23,7 @@ export default function DidAuthentication({ challenge, onClose }: {
         if (!success) throw new Error('Failed to fetch DID Users')
         setUsers(data as DidUser[])
     }
+
     useEffect(() => {
         getUsers()
         const handler = (e: KeyboardEvent) => {
@@ -31,16 +32,19 @@ export default function DidAuthentication({ challenge, onClose }: {
         document.addEventListener('keydown', handler)
         return () => document.removeEventListener('keydown', handler)
     }, [])
+    
 
-    return (
-        <div style={styles.backdrop} role='dialog' aria-modal='true'>
-            <div style={styles.modal}>
-                {userIsSelected ? <Loader /> : <>
+    return <div style={styles.backdrop} role='dialog' aria-modal='true'>
+        <div style={styles.modal}>
+            {userIsSelected ?
+                <div style={styles.loaderWrapper}>
+                    <CircularProgress style={styles.loaderProgress} />
+                    <p style={styles.loaderText}>Authenticating...</p>
+                </div>
+                :
+                <>
                     <div style={styles.header}>
                         <h2 style={styles.title}>Select your Decentralized ID</h2>
-                        <button onClick={onClose} style={styles.closeBtn} aria-label="Close">
-                            <X size={20} />
-                        </button>
                     </div>
                     <div style={styles.list}>
                         {users.map(user => <DidRow
@@ -52,10 +56,10 @@ export default function DidAuthentication({ challenge, onClose }: {
                         />)}
                     </div>
                     <button onClick={onClose} style={styles.cancelBtn}>Cancel</button>
-                </>}
-            </div>
+                </>
+            }
         </div>
-    )
+    </div>
 }
 
 export const mountDidSelector = (challenge: AuthChallenge, onClose: () => void) => {
