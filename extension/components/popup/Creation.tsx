@@ -33,7 +33,8 @@ export default function Creation({ onStateChange, onUserCreation }: {
         return !Object.values(error).some(e => e)
     }
 
-    const didCreationHandler = async () => {
+    const didCreationHandler = async (e: React.MouseEvent) => {
+        e.preventDefault()
         if (!userIsValid()) return
         setCreating(true)
         const did = await createIonDid({
@@ -57,8 +58,8 @@ export default function Creation({ onStateChange, onUserCreation }: {
                 </h2>
             </div>
 
-            <div className='flex flex-col gap-3 py-10'>
-                <Tooltip title='This is a readable unique identifier locally linked to your DID, e.g., souviks22, _mistletoee._ etc.'>
+            <form className='flex flex-col gap-5 py-10'>
+                <Tooltip title='This is an one-word identifier linked to your DID, e.g., souviks22, _mistletoee._ etc.'>
                     <TextField
                         fullWidth
                         size='small'
@@ -71,7 +72,7 @@ export default function Creation({ onStateChange, onUserCreation }: {
                     />
                 </Tooltip>
 
-                <Tooltip title='This is formally your legal name, e.g., Souvik Sarkar, Bristi Maity etc.'>
+                <Tooltip title='This is your common family name, e.g., Souvik Sarkar, Bristi Maity etc.'>
                     <TextField
                         fullWidth
                         size='small'
@@ -109,16 +110,19 @@ export default function Creation({ onStateChange, onUserCreation }: {
                         helperText={error?.profile ? 'Enter a longer user profile' : ''}
                     />
                 </Tooltip>
-            </div>
-            <button
-                onClick={didCreationHandler}
-                className='px-4 py-2 w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded'
-            >
-                Create
-            </button>
-            <p className='py-5 text-center'>
-                A brand new Decentralized Identifier (DID) will be generated afterwards
-            </p>
+                <div className='py-10'>
+                    <button
+                        onClick={didCreationHandler}
+                        className='px-4 py-2 w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded'
+                        type='submit'
+                    >
+                        Create
+                    </button>
+                    <p className='py-5 text-center'>
+                        A brand new Decentralized Identifier (DID) will be generated
+                    </p>
+                </div>
+            </form>
         </>
         :
         <div className='flex flex-col items-center justify-center h-full text-center'>
