@@ -58,7 +58,7 @@ export default function Creation({ onStateChange, onUserCreation }: {
             </div>
 
             <div className='flex flex-col gap-3 py-10'>
-                <Tooltip title='This is a readable unique identifier locally linked to your DID, e.g., souviks22, _mistletoee._ etc.' arrow>
+                <Tooltip title='This is a readable unique identifier locally linked to your DID, e.g., souviks22, _mistletoee._ etc.'>
                     <TextField
                         fullWidth
                         size='small'
@@ -71,7 +71,7 @@ export default function Creation({ onStateChange, onUserCreation }: {
                     />
                 </Tooltip>
 
-                <Tooltip title='This is formally your legal name, e.g., Souvik Sarkar, Bristi Maity etc.' arrow>
+                <Tooltip title='This is formally your legal name, e.g., Souvik Sarkar, Bristi Maity etc.'>
                     <TextField
                         fullWidth
                         size='small'
@@ -84,7 +84,7 @@ export default function Creation({ onStateChange, onUserCreation }: {
                     />
                 </Tooltip>
 
-                <Tooltip title='Optional email ID, e.g., souviksarkar2k3@gmail.com, bristimaity03@gmail.com etc.' arrow>
+                <Tooltip title='Optional email ID, e.g., souviksarkar2k3@gmail.com, bristimaity03@gmail.com etc.'>
                     <TextField
                         fullWidth
                         size='small'
@@ -97,7 +97,7 @@ export default function Creation({ onStateChange, onUserCreation }: {
                     />
                 </Tooltip>
 
-                <Tooltip title='Optional profile domain to classify your identities, e.g., Personal, Work etc.' arrow>
+                <Tooltip title='Optional profile domain to classify your identities, e.g., Personal, Work etc.'>
                     <TextField
                         fullWidth
                         size='small'
