@@ -3,8 +3,8 @@ import type { AuthChallenge } from './passkey'
 
 export interface WindowMessage {
     source: 'byoi-sdk' | 'byoi-extension'
-    type: 'signin-request' | 'signin-response' | 'signin-error'
-    challenge: AuthChallenge,
+    type: 'signin-request' | 'signin-response' | 'signin-error' | 'signin-ping' | 'signin-pong'
+    challenge?: AuthChallenge,
     auth?: {
         trigger: 'signup' | 'signin'
         publicKey: JsonWebKey

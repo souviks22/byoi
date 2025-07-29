@@ -16,10 +16,21 @@ export default defineContentScript({
         position: 'modal',
         anchor: 'body',
         append: 'first',
-        onMount: mountDidSelector(challenge, closeHandler),
+        onMount: mountDidSelector(challenge!, closeHandler),
         onRemove: root => root?.unmount()
       })
       ui.mount()
+    })
+    
+    window.addEventListener('message', ({ source: sender, data }) => {
+      if (sender != window) return
+      const { source, type } = data as WindowMessage
+      if (source !== 'byoi-sdk' || type !== 'signin-ping') return
+      const message: WindowMessage = {
+        source: 'byoi-extension',
+        type: 'signin-pong'
+      }
+      window.postMessage(message, window.location.origin)
     })
   }
 })
