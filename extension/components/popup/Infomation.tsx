@@ -87,7 +87,7 @@ export default function Infomation({ user, onStateChange }: {
                             <Typography variant='subtitle2' gutterBottom>
                                 Websites Signed In with
                             </Typography>
-                            <List dense disablePadding>
+                            <List sx={{ maxHeight: 180, overflow: 'auto' }} dense disablePadding>
                                 {sites.map((site, i) => (
                                     <ListItem key={i} disableGutters>
                                         <ListItemAvatar>
@@ -96,7 +96,7 @@ export default function Infomation({ user, onStateChange }: {
                                             </a>
                                         </ListItemAvatar>
                                         <ListItemText
-                                            primary={site.split('.').slice(1, 2)}
+                                            primary={site.split('.').at(-2)}
                                             secondary={site}
                                         />
                                     </ListItem>
