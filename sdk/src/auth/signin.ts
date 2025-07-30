@@ -15,23 +15,29 @@ export const signin = (): Promise<{
                 resolve({ success: false, trigger: 'missing-extension' })
             }
         }).catch(e => reject(e))
+
         const confirmation = ({ source: sender, data }: MessageEvent) => {
-            if (sender !== window) return
-            const { source, type, challenge, auth } = data as WindowMessage
-            if (source !== 'byoi-extension') return
-            if (type === 'signin-error') return reject('Failed to signin')
-            if (type !== 'signin-response') return
-            if (Date.now() - challenge!.timestamp > 1 * 60 * 60 * 1000) return reject('Failed to signin')
-            window.removeEventListener('message', confirmation)
-            const { trigger, signin, publicKey } = auth!
-            if (trigger === 'signup') return resolve({ success: true, trigger })
-            verifyPasskey({
-                clientDataJSON: uint8arrays.fromString(signin?.clientDataJSON, 'base64url'),
-                authenticatorData: uint8arrays.fromString(signin?.authenticatorData, 'base64url'),
-                signature: uint8arrays.fromString(signin?.signature, 'base64url'),
-                publicJwk: publicKey
-            }).then(verified => resolve({ success: verified, trigger }))
-                .catch(e => reject(e))
+            try {
+                if (sender !== window) return
+                const { source, type, challenge, auth } = data as WindowMessage
+                if (source !== 'byoi-extension') return
+                if (type === 'signin-error') return reject('Failed to signin')
+                if (type !== 'signin-response') return
+                if (Date.now() - challenge!.timestamp > 1 * 60 * 60 * 1000) return reject('Failed to signin')
+                window.removeEventListener('message', confirmation)
+                const { trigger, signin, publicKey } = auth!
+                if (trigger === 'signup') return resolve({ success: true, trigger })
+
+                verifyPasskey({
+                    clientDataJSON: uint8arrays.fromString(signin?.clientDataJSON, 'base64url'),
+                    authenticatorData: uint8arrays.fromString(signin?.authenticatorData, 'base64url'),
+                    signature: uint8arrays.fromString(signin?.signature, 'base64url'),
+                    publicJwk: publicKey
+                }).then(verified => resolve({ success: verified, trigger }))
+                
+            } catch (e) {
+                reject(e)
+            }
         }
         window.addEventListener('message', confirmation)
         const bytes = new Uint8Array(32)
