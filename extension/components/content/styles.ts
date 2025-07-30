@@ -50,6 +50,20 @@ export const baseStyles: Record<string, React.CSSProperties> = {
         overflow: 'hidden',
         textOverflow: 'ellipsis',
     },
+    preferredTag: {
+        marginLeft: '10px',
+        padding: '3px 10px',
+        borderRadius: '9999px',
+        fontSize: '13px',
+        fontWeight: 600,
+        fontFamily: '"Segoe UI", system-ui, sans-serif',
+        display: 'inline-block',
+        verticalAlign: 'middle',
+        userSelect: 'none',
+        letterSpacing: '0.3px',
+        transition: 'all 0.2s ease',
+        backdropFilter: 'blur(2px)',
+    },
     cancelBtn: {
         marginTop: '10px',
         padding: '12px',
@@ -103,6 +117,12 @@ export const lightStyles: Record<string, React.CSSProperties> = {
     didBtn: {
         color: '#0f172a',
     },
+    preferredTag: {
+        background: 'linear-gradient(135deg, #fefce8, #fcd34d)',
+        color: '#92400e',
+        border: '1px solid #fbbf24',
+        boxShadow: '0 2px 6px rgba(251,191,36,0.25)',
+    },
     loaderText: {
         color: '#64748b',
     },
@@ -132,6 +152,12 @@ export const darkStyles: Record<string, React.CSSProperties> = {
     },
     didBtn: {
         color: '#ffffff',
+    },
+    preferredTag: {
+        background: 'linear-gradient(135deg, #334155, #1e293b)',
+        color: '#facc15',
+        border: '1px solid #475569',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
     },
     loaderText: {
         color: '#cbd5e1',

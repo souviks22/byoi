@@ -1,10 +1,11 @@
 import type { RuntimeMessage, RuntimeResponse } from '@/types/messaging'
-import type { DidUser } from '@/types/did'
+import type { Did, DidUser } from '@/types/did'
 import type { AuthChallenge } from '@/types/passkey'
 import { CircularProgress } from '@mui/material'
 import { styles } from './styles'
 import ReactDOM from 'react-dom/client'
 import DidRow from './DidRow'
+import { PREFERRED_DID } from '../popup/Overview'
 
 export default function DidAuthentication({ challenge, onClose }: {
     challenge: AuthChallenge
@@ -21,7 +22,15 @@ export default function DidAuthentication({ challenge, onClose }: {
         }
         const { success, data } = await browser.runtime.sendMessage(message) as RuntimeResponse
         if (!success) throw new Error('Failed to fetch DID Users')
-        setUsers(data as DidUser[])
+        const users = data as DidUser[]
+        const storage = await browser.storage.local.get(PREFERRED_DID)
+        if (!(PREFERRED_DID in storage)) return
+        const preferred = storage[PREFERRED_DID] as Did
+        const i = users.map(user => user.id).findIndex(did => did === preferred)
+        if (i === -1) return setUsers(users)
+        const featured = users.slice(0, i).concat(users.slice(i + 1))
+        featured.unshift(users[i])
+        setUsers(featured)
     }
 
     useEffect(() => {
@@ -32,7 +41,7 @@ export default function DidAuthentication({ challenge, onClose }: {
         document.addEventListener('keydown', handler)
         return () => document.removeEventListener('keydown', handler)
     }, [])
-    
+
 
     return <div style={styles.backdrop} role='dialog' aria-modal='true'>
         <div style={styles.modal}>
@@ -47,12 +56,13 @@ export default function DidAuthentication({ challenge, onClose }: {
                         <h2 style={styles.title}>Select your Decentralized ID</h2>
                     </div>
                     <div style={styles.list}>
-                        {users.map(user => <DidRow
+                        {users.map((user, i) => <DidRow
                             key={user.id}
                             user={user}
                             challenge={challenge}
                             onSelect={() => setUserIsSelected(true)}
                             onClose={onClose}
+                            preferred={i === 0}
                         />)}
                     </div>
                     <button onClick={onClose} style={styles.cancelBtn}>Cancel</button>

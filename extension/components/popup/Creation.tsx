@@ -3,6 +3,7 @@ import type { DidUser } from '@/types/did'
 import { TextField, CircularProgress, Tooltip } from '@mui/material'
 import { motion } from 'framer-motion'
 import { ArrowLeft } from 'lucide-react'
+import { PREFERRED_DID } from './Overview'
 
 export default function Creation({ onStateChange, onUserCreation }: {
     onStateChange: (state: PopupState) => void
@@ -42,6 +43,7 @@ export default function Creation({ onStateChange, onUserCreation }: {
             displayName: user?.displayName!,
             ...user
         })
+        await browser.storage.local.set({ [PREFERRED_DID]: did.id })
         onUserCreation(did)
         setCreated(true)
         onStateChange('did-overview')
@@ -61,6 +63,7 @@ export default function Creation({ onStateChange, onUserCreation }: {
             <form className='flex flex-col gap-5 py-10'>
                 <Tooltip title='This is an one-word identifier linked to your DID, e.g., souviks22, _mistletoee._ etc.'>
                     <TextField
+                        autoFocus
                         fullWidth
                         size='small'
                         variant='outlined'

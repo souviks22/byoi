@@ -1,16 +1,24 @@
 import type { PopupState } from '@/types/popup'
-import type { DidUser } from '@/types/did'
+import type { Did, DidUser } from '@/types/did'
 import { Info } from 'lucide-react'
 import { Tooltip } from '@mui/material'
+
+export const PREFERRED_DID = 'currently-preferred-did-identity'
 
 export default function Overview({ users, onStateChange, onDidInfo }: {
   users: DidUser[]
   onStateChange: (state: PopupState) => void
   onDidInfo: (user: DidUser) => void
 }) {
-  const [active, setActive] = useState<number>(0)
+  const [preferred, setPreferred] = useState<number>(0)
   useEffect(() => {
-    setActive(Math.max(users.length - 1, 0))
+    (async () => {
+      const storage = await browser.storage.local.get(PREFERRED_DID)
+      if (!(PREFERRED_DID in storage)) return
+      const preferred = storage[PREFERRED_DID] as Did
+      const i = users.map(user => user.id).findIndex(did => did === preferred)
+      setPreferred(i)
+    })()
   }, [users])
 
   return <>
@@ -22,13 +30,13 @@ export default function Overview({ users, onStateChange, onDidInfo }: {
     {users.length ?
       <>
         <div className='mt-4'>
-          <p className='text-sm text-gray-600 dark:text-neutral-300 mb-1'>Currently Active DID:</p>
+          <p className='text-sm text-gray-600 dark:text-neutral-300 mb-1'>Currently Preferred DID:</p>
           <div className='p-4 border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-[#242628]'>
             <p className='text-sm font-semibold text-gray-900 dark:text-neutral-100'>
-              {users[active].profile || users[active].name}
+              {users.at(preferred)?.profile || users.at(preferred)?.name}
             </p>
             <p className='text-xs text-gray-600 dark:text-neutral-400 break-all'>
-              {`${users[active].id.slice(0, 20)}...`}
+              {`${users.at(preferred)?.id.slice(0, 20)}...`}
             </p>
           </div>
         </div>
@@ -39,10 +47,13 @@ export default function Overview({ users, onStateChange, onDidInfo }: {
             {users.map((did, i) => (
               <li key={did.id}
                 className={`flex justify-between items-center gap-1 w-full text-left px-4 py-2 rounded transition duration-150 text-sm font-medium focus:outline-none
-                      ${users[active].id === did.id
+                      ${users.at(preferred)?.id === did.id
                     ? 'bg-blue-100 dark:bg-blue-400/10 text-blue-700 dark:text-blue-300'
                     : 'hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-900 dark:text-neutral-100'}`}
-                onClick={() => setActive(i)}
+                onClick={() => {
+                  setPreferred(i)
+                  browser.storage.local.set({ [PREFERRED_DID]: did.id })
+                }}
               >
                 <div>
                   <p>{did.profile || did.name}</p>
