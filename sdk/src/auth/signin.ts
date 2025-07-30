@@ -1,11 +1,20 @@
 import { WindowMessage } from '../types/messaging'
 import { Base64Url } from '../types/passkey'
+import { injectExtensionFallback } from './fallback'
 import { decodeDER, extensionDoesExist } from './helper'
 import * as uint8arrays from 'uint8arrays'
 
-export const signin = (): Promise<{ trigger: string }> => {
+export const signin = (): Promise<{
+    success: boolean
+    trigger: 'signup' | 'signin'
+
+}> => {
     return new Promise((resolve, reject) => {
-        extensionDoesExist().catch(() => reject('Failed to find BYOI extension'))
+        extensionDoesExist().then(exists => {
+            if (!exists) {
+                injectExtensionFallback()
+            }
+        }).catch(e => reject(e))
         const confirmation = ({ source: sender, data }: MessageEvent) => {
             if (sender !== window) return
             const { source, type, challenge, auth } = data as WindowMessage
@@ -15,13 +24,13 @@ export const signin = (): Promise<{ trigger: string }> => {
             if (Date.now() - challenge!.timestamp > 1 * 60 * 60 * 1000) return reject('Failed to signin')
             window.removeEventListener('message', confirmation)
             const { trigger, signin, publicKey } = auth!
-            if (trigger === 'signup') return resolve({ trigger })
+            if (trigger === 'signup') return resolve({ success: true, trigger })
             verifyPasskey({
                 clientDataJSON: uint8arrays.fromString(signin?.clientDataJSON, 'base64url'),
                 authenticatorData: uint8arrays.fromString(signin?.authenticatorData, 'base64url'),
                 signature: uint8arrays.fromString(signin?.signature, 'base64url'),
                 publicJwk: publicKey
-            }).then(() => resolve({ trigger }))
+            }).then(() => resolve({ success: true, trigger }))
                 .catch(() => reject('Failed to signin'))
         }
         window.addEventListener('message', confirmation)
@@ -60,7 +69,7 @@ export const verifyPasskey = async ({ clientDataJSON, authenticatorData, signatu
         false,
         ['verify']
     )
-    const verified = await crypto.subtle.verify(
+    return await crypto.subtle.verify(
         {
             name: 'ECDSA',
             hash: { name: 'SHA-256' }
@@ -69,5 +78,4 @@ export const verifyPasskey = async ({ clientDataJSON, authenticatorData, signatu
         decodeDER(signature),
         signedData
     )
-    if (!verified) throw new Error('Failed to assert webauthn credential')
 }

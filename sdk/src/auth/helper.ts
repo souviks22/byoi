@@ -2,14 +2,18 @@ import { WindowMessage } from '../types/messaging'
 
 export const extensionDoesExist = (): Promise<boolean> => {
     return new Promise((resolve, reject) => {
-        const timeout = setTimeout(() => reject(), 2000)
+        const timeout = setTimeout(() => resolve(false), 1000)
         const existence = ({ source: sender, data }: MessageEvent) => {
-            if (sender !== window) return
-            const { source, type } = data as WindowMessage
-            if (source !== 'byoi-extension' || type !== 'signin-pong') return
-            window.removeEventListener('message', existence)
-            clearTimeout(timeout)
-            resolve(true)
+            try {
+                if (sender !== window) return
+                const { source, type } = data as WindowMessage
+                if (source !== 'byoi-extension' || type !== 'signin-pong') return
+                window.removeEventListener('message', existence)
+                clearTimeout(timeout)
+                resolve(true)
+            } catch (e) {
+                reject(e)
+            }
         }
         window.addEventListener('message', existence)
         const message: WindowMessage = {
