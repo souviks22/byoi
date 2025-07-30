@@ -1,18 +1,18 @@
 import { WindowMessage } from '../types/messaging'
 import { Base64Url } from '../types/passkey'
 import { injectExtensionFallback } from './fallback'
-import { decodeDER, extensionDoesExist } from './helper'
+import { decodeDER, detectExtension } from './helper'
 import * as uint8arrays from 'uint8arrays'
 
 export const signin = (): Promise<{
     success: boolean
-    trigger: 'signup' | 'signin'
-
+    trigger: 'signup' | 'signin' | 'missing-extension'
 }> => {
     return new Promise((resolve, reject) => {
-        extensionDoesExist().then(exists => {
+        detectExtension().then(exists => {
             if (!exists) {
                 injectExtensionFallback()
+                resolve({ success: false, trigger: 'missing-extension' })
             }
         }).catch(e => reject(e))
         const confirmation = ({ source: sender, data }: MessageEvent) => {
@@ -30,8 +30,8 @@ export const signin = (): Promise<{
                 authenticatorData: uint8arrays.fromString(signin?.authenticatorData, 'base64url'),
                 signature: uint8arrays.fromString(signin?.signature, 'base64url'),
                 publicJwk: publicKey
-            }).then(() => resolve({ success: true, trigger }))
-                .catch(() => reject('Failed to signin'))
+            }).then(verified => resolve({ success: verified, trigger }))
+                .catch(e => reject(e))
         }
         window.addEventListener('message', confirmation)
         const bytes = new Uint8Array(32)

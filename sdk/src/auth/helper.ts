@@ -1,6 +1,6 @@
 import { WindowMessage } from '../types/messaging'
 
-export const extensionDoesExist = (): Promise<boolean> => {
+export const detectExtension = (): Promise<boolean> => {
     return new Promise((resolve, reject) => {
         const timeout = setTimeout(() => resolve(false), 1000)
         const existence = ({ source: sender, data }: MessageEvent) => {
