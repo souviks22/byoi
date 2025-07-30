@@ -110,7 +110,7 @@ await sdk.signIn()
 
 ## 📄 License
 
-MIT © \[Your Name or Organization]
+MIT © Souvik Sarkar
 
 ---
 
