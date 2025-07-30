@@ -8,8 +8,9 @@ export default defineContentScript({
     console.log('Hello content.')
     window.addEventListener('message', ({ source: sender, data }) => {
       if (sender != window) return
-      const { source, type, challenge } = data as WindowMessage
+      const { source, type, challenge, persistingUser } = data as WindowMessage
       if (source !== 'byoi-sdk' || type !== 'signin-request') return
+      if (persistingUser && challenge) return signin(persistingUser, challenge)
       let ui: globalThis.IntegratedContentScriptUi<unknown>
       const closeHandler = () => ui?.remove()
       ui = createIntegratedUi(ctx, {
@@ -21,7 +22,7 @@ export default defineContentScript({
       })
       ui.mount()
     })
-    
+
     window.addEventListener('message', ({ source: sender, data }) => {
       if (sender != window) return
       const { source, type } = data as WindowMessage

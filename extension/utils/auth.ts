@@ -4,8 +4,10 @@ import type { AuthChallenge } from '@/types/passkey'
 import { IonPublicKeyPurpose } from '@decentralized-identity/ion-sdk'
 import * as uint8arrays from 'uint8arrays'
 
-export const signin = async ({ id, name, displayName }: DidUser, challenge: AuthChallenge) => {
+export const signin = async (user: DidUser, challenge: AuthChallenge) => {
     try {
+        const { id, name, displayName } = user
+        const document = await resolveIonDid(id)
         const credential = await getCredentialFromIDB(id)
         if (!credential) {
             const { response, credentialId } = await createPasskey({
@@ -26,6 +28,7 @@ export const signin = async ({ id, name, displayName }: DidUser, challenge: Auth
                     trigger: 'signup',
                     publicKey: publicJwk,
                     signup: {
+                        user,
                         clientDataJSON: bytesToB64url(response.clientDataJSON),
                         attestationObject: bytesToB64url(response.attestationObject)
                     }
@@ -37,8 +40,7 @@ export const signin = async ({ id, name, displayName }: DidUser, challenge: Auth
                 challenge,
                 credentialId: b64urlToBytes(credential)
             })
-            const { content: document } = await resolveIonDid(id)
-            const { publicKeyJwk } = document.publicKeys?.filter(pk => pk.id === utfToB64url(window.location.hostname))[0]!
+            const { publicKeyJwk } = document.content.publicKeys?.filter(pk => pk.id === utfToB64url(window.location.hostname))[0]!
             const message: WindowMessage = {
                 source: 'byoi-extension',
                 type: 'signin-response',
@@ -47,6 +49,7 @@ export const signin = async ({ id, name, displayName }: DidUser, challenge: Auth
                     trigger: 'signin',
                     publicKey: publicKeyJwk,
                     signin: {
+                        user,
                         clientDataJSON: bytesToB64url(response.clientDataJSON),
                         authenticatorData: bytesToB64url(response.authenticatorData),
                         signature: bytesToB64url(response.signature)
