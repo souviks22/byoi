@@ -1,4 +1,4 @@
-import { WindowMessage } from '../types/messaging'
+import type { WindowMessage } from '../types/messaging'
 
 export const detectExtension = (): Promise<boolean> => {
     return new Promise((resolve, reject) => {

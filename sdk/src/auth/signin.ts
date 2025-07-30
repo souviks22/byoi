@@ -1,18 +1,23 @@
-import { WindowMessage } from '../types/messaging'
-import { Base64Url } from '../types/passkey'
+import type { WindowMessage } from '../types/messaging'
+import type { Base64Url, DidUser } from '../types/passkey'
 import { injectExtensionFallback } from './fallback'
 import { decodeDER, detectExtension } from './helper'
 import * as uint8arrays from 'uint8arrays'
 
-export const signin = (): Promise<{
+export const BYOI_SESSION_KEY = 'byoi-did-session'
+export const MINUTE = 60 * 1000
+
+export const authenticate = (user?: DidUser | null): Promise<{
     success: boolean
-    trigger: 'signup' | 'signin' | 'missing-extension'
+    trigger: 'signup' | 'signin' | 'no-persistence' | 'missing-extension'
+    user: DidUser | null
 }> => {
     return new Promise((resolve, reject) => {
+        if (user === null) return resolve({ success: false, trigger: 'no-persistence', user: null })
         detectExtension().then(exists => {
             if (!exists) {
                 injectExtensionFallback()
-                resolve({ success: false, trigger: 'missing-extension' })
+                resolve({ success: false, trigger: 'missing-extension', user: null })
             }
         }).catch(e => reject(e))
 
@@ -23,18 +28,28 @@ export const signin = (): Promise<{
                 if (source !== 'byoi-extension') return
                 if (type === 'signin-error') return reject('Failed to signin')
                 if (type !== 'signin-response') return
-                if (Date.now() - challenge!.timestamp > 1 * 60 * 60 * 1000) return reject('Failed to signin')
+                if (Date.now() - challenge!.timestamp > 5 * MINUTE) return reject('Failed to signin')
                 window.removeEventListener('message', confirmation)
-                const { trigger, signin, publicKey } = auth!
-                if (trigger === 'signup') return resolve({ success: true, trigger })
-
-                verifyPasskey({
-                    clientDataJSON: uint8arrays.fromString(signin?.clientDataJSON, 'base64url'),
-                    authenticatorData: uint8arrays.fromString(signin?.authenticatorData, 'base64url'),
-                    signature: uint8arrays.fromString(signin?.signature, 'base64url'),
-                    publicJwk: publicKey
-                }).then(verified => resolve({ success: verified, trigger }))
-                
+                const { trigger, signup, signin, publicKey } = auth!
+                if (trigger === 'signup') {
+                    resolve({
+                        success: true, trigger,
+                        user: signup!.user
+                    })
+                    localStorage.setItem(BYOI_SESSION_KEY, JSON.stringify(signup!.user))
+                }
+                else {
+                    verifyPasskey({
+                        clientDataJSON: uint8arrays.fromString(signin?.clientDataJSON, 'base64url'),
+                        authenticatorData: uint8arrays.fromString(signin?.authenticatorData, 'base64url'),
+                        signature: uint8arrays.fromString(signin?.signature, 'base64url'),
+                        publicJwk: publicKey
+                    }).then(verified => resolve({
+                        success: verified, trigger,
+                        user: verified ? signin!.user : null
+                    }))
+                    localStorage.setItem(BYOI_SESSION_KEY, JSON.stringify(signin!.user))
+                }
             } catch (e) {
                 reject(e)
             }
@@ -48,7 +63,8 @@ export const signin = (): Promise<{
             challenge: {
                 payload: uint8arrays.toString(bytes, 'base64url') as Base64Url,
                 timestamp: Date.now()
-            }
+            },
+            persistingUser: user
         }
         window.postMessage(message, window.location.origin)
     })
