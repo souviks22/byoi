@@ -35,7 +35,7 @@ export default function Overview({ users, onStateChange, onDidInfo }: {
 
         <div className='mt-6'>
           <p className='text-sm text-gray-600 dark:text-neutral-300 mb-1'>Switch Identity:</p>
-          <ul>
+          <ul className='max-h-60 overflow-auto'>
             {users.map((did, i) => (
               <li key={did.id}
                 className={`flex justify-between items-center gap-1 w-full text-left px-4 py-2 rounded transition duration-150 text-sm font-medium focus:outline-none

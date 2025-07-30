@@ -24,7 +24,7 @@ export interface WindowMessage {
 }
 
 export interface RuntimeParams {
-    did?: Did
+    did?: Did | '<all_users>'
     keys?: DidKeys
     user?: DidUser
     passkey?: DidPasskey

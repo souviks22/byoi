@@ -19,9 +19,9 @@ export const baseStyles: Record<string, React.CSSProperties> = {
         flexDirection: 'column',
         gap: '12px',
         overflowY: 'auto',
-        paddingInline: '4px',
+        paddingInline: '10px',
         marginBottom: '24px',
-        maxHeight: '280px',
+        maxHeight: '260px',
     },
     didRow: {
         display: 'flex',

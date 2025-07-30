@@ -1,6 +1,6 @@
 import type { JwkEs256k, IonPublicKeyModel, IonDocumentModel } from '@decentralized-identity/ion-sdk'
 
-export type Did = `did:ion:${string}` | '<all_users>'
+export type Did = `did:ion:${string}`
 export type Base64Url = string & { __brand: 'base64url' }
 
 export interface DidKeys {
