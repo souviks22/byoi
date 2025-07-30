@@ -22,7 +22,10 @@ class IonDB {
     }
 }
 
-const save = async (storeName: string, value: object) => {
+const save = async (storeName: string, value: {
+    id: string
+    [key: string]: any
+}) => {
     const db = await IonDB.getDB()
     const tx = db.transaction(storeName, 'readwrite')
     const store = tx.objectStore(storeName)
@@ -45,11 +48,13 @@ const get = async (storeName: string, id: IDBValidKey) => {
 }
 
 export const saveKeys = async ({ keys }: RuntimeParams) => {
-    await save('keys', keys!)
+    const content = utfToB64url(JSON.stringify(keys))
+    await save('keys', { id: keys!.id, content })
 }
 
 export const getKeys = async ({ did }: RuntimeParams) => {
-    return await get('keys', did!) as DidKeys
+    const value = await get('keys', did!)
+    return JSON.parse(b64urlToUtf(value.content)) as DidKeys
 }
 
 export const saveUser = async ({ user }: RuntimeParams) => {
