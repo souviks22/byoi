@@ -4,23 +4,22 @@ The **BYOI SDK** is a minimal, secure JavaScript library that enables frontend a
 
 It handles communication with the extension, manages persistent sessions, and provides easy methods for sign-in and sign-out.
 
-<p align="left">
-  <img alt="TypeScript" src="https://img.shields.io/badge/Built%20with-TypeScript-3178c6" />
-  <img alt="ESM" src="https://img.shields.io/badge/Module%20Format-ESM-blue" />
-  <img alt="Code Style: Prettier" src="https://img.shields.io/badge/code_style-prettier-ff69b4" />
-  <img alt="Lint: ESLint" src="https://img.shields.io/badge/lint-eslint-yellow" />
-  <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg" />
-</p>
+[![Module Format: ESM](https://img.shields.io/badge/Module%20Format-ESM-blue)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules)
+[![Made with TypeScript](https://img.shields.io/badge/Made%20with-TypeScript-3178C6?logo=typescript\&logoColor=white)](https://www.typescriptlang.org/)
+[![Code Style: Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4)](https://prettier.io/)
+[![Lint: ESLint](https://img.shields.io/badge/lint-eslint-yellow)](https://eslint.org/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](../LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/souviks22/byoi/issues)
 
 ---
 
 ## 🚀 Features
 
-- ✅ One-liner `signIn()` flow for BYOI authentication  
-- 🔁 Automatic session restore with `signinIfPersists()`  
-- 🔓 Secure messaging with the BYOI browser extension  
-- 🧼 Clean ESM-compatible, framework-agnostic design  
-- 🌐 Works with any modern frontend (React, Vue, Next.js, etc.)
+* ✅ One-liner `signIn()` flow for BYOI authentication
+* 🔁 Automatic session restore with `signinIfPersists()`
+* 🔓 Secure messaging with the BYOI browser extension
+* 🧼 Clean ESM-compatible, framework-agnostic design
+* 🌐 Works with any modern frontend (React, Vue, Next.js, etc.)
 
 ---
 
@@ -28,7 +27,7 @@ It handles communication with the extension, manages persistent sessions, and pr
 
 ```bash
 npm install @byoi/sdk
-````
+```
 
 Or using a CDN (for vanilla usage):
 
@@ -89,20 +88,6 @@ BYOI Extension <-> WebAuthn + LocalStorage
 
 ---
 
-## 🔍 Project Structure
-
-```
-@byoi/sdk/
-├── src/
-│   ├── auth.ts         # Core sign-in / sign-out logic
-│   └── index.ts        # Exposes BYOI methods
-├── dist/               # ESM output (bundled)
-├── package.json
-└── README.md
-```
-
----
-
 ## 🧪 Example Integration
 
 ```ts
@@ -146,4 +131,3 @@ MIT © Souvik Sarkar
 * [`byoi-extension`](https://github.com/souviks22/byoi) — BYOI Browser Extension (required for this SDK to work)
 * [`did:ion`](https://identity.foundation/ion/) — Decentralized Identifier Method
 * [`webauthn`](https://www.w3.org/TR/webauthn/) — Core standard used for device-based authentication
-
