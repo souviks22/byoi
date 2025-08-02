@@ -1,54 +1,50 @@
 # 🧩 BYOI Extension · Bring Your Own Identity
 
-A secure browser extension enabling **user-owned decentralized identity** across the web.  
+A secure browser extension enabling **user-owned decentralized identity** across the web.
 Designed to pair with the BYOI SDK, this extension empowers users to authenticate, manage DIDs, and perform cryptographic operations—all from their browser.
 
-<p align="left">
-  <a href="https://developer.chrome.com/docs/extensions/mv3/intro/"><img alt="Manifest V3" src="https://img.shields.io/badge/Manifest%20V3-Enabled-green"></a>
-  <a href="https://www.typescriptlang.org/"><img alt="TypeScript" src="https://img.shields.io/badge/Built%20with-TypeScript-3178c6"></a>
-  <img alt="Code Style: Prettier" src="https://img.shields.io/badge/code_style-prettier-ff69b4">
-  <img alt="Lint: ESLint" src="https://img.shields.io/badge/lint-eslint-yellow">
-  <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg">
-</p>
+[![Manifest V3](https://img.shields.io/badge/Manifest%20V3-Enabled-green)](https://developer.chrome.com/docs/extensions/mv3/intro/)
+[![Made with TypeScript](https://img.shields.io/badge/Made%20with-TypeScript-3178C6?logo=typescript\&logoColor=white)](https://www.typescriptlang.org/)
+[![Built with WXT](https://img.shields.io/badge/Built%20with-WXT-9146FF?logo=wxt\&logoColor=white)](https://wxt.dev/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/souviks22/byoi/issues)
 
 ---
 
 ## 🌐 Overview
 
-**BYOI (Bring Your Own Identity)** is a privacy-first authentication framework designed to let users bring their identity across websites—securely and independently.  
+**BYOI (Bring Your Own Identity)** is a privacy-first authentication framework designed to let users bring their identity across websites—securely and independently.
 This extension forms the cryptographic anchor of that system.
 
 It communicates with the BYOI SDK injected in websites, handling:
 
-- 🔐 Secure WebAuthn-based identity operations
-- 🔑 Decentralized Identifier (DID) resolution and signing
-- 🔄 Persistent session storage across tabs
-- ⚡ Lightweight messaging channel between content scripts and web apps
+* 🔐 Secure WebAuthn-based identity operations
+* 🔑 Decentralized Identifier (DID) resolution and signing
+* 🔄 Persistent session storage across tabs
+* ⚡ Lightweight messaging channel between content scripts and web apps
 
 ---
 
 ## ✨ Key Features
 
-- ✅ Local-first, zero-tracking identity provider
-- 🔐 Hardware-backed WebAuthn key management
-- 📁 Private key encryption using AES-GCM
-- 🧩 Compatible with any frontend via BYOI SDK
-- ☁️ No cloud sync or server dependency
-- 🌙 Auto-themed light/dark UI
-- 🛡️ Manifest V3, CSP-safe architecture
+* ✅ Local-first, zero-tracking identity provider
+* 🔐 Hardware-backed WebAuthn key management
+* 📁 Private key encryption using AES-GCM
+* 🧩 Compatible with any frontend via BYOI SDK
+* ☁️ No cloud sync or server dependency
+* 🌙 Auto-themed light/dark UI
+* 🛡️ Manifest V3, CSP-safe architecture
 
 ---
 
 ## 🧠 Architecture
 
 ```
-
 Web Page <-> BYOI SDK
 ↓
 Content Script <-> Background Service Worker
 ↓
 Encrypted Key Storage (via WebAuthn + AES-GCM)
-
 ```
 
 ---
@@ -83,10 +79,9 @@ The SDK handles frontend logic and communicates with this extension via message 
 Example:
 
 ```ts
-import { BYOI } from '@byoi/sdk'
+import BYOI from '@byoi/sdk'
 
-const sdk = new BYOI()
-await sdk.signIn()
+const credentials = await BYOI.signin()
 ```
 
 ---
@@ -96,7 +91,6 @@ await sdk.signIn()
 * [TypeScript](https://www.typescriptlang.org/)
 * [ESLint](https://eslint.org/) + [Prettier](https://prettier.io/)
 * [Vite](https://vitejs.dev/) or [WXT](https://wxt.dev/) for fast HMR
-* `webextension-polyfill` for browser compatibility
 
 ---
 
